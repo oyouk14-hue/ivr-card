@@ -95,10 +95,11 @@ font-size:22px;
 <button class="correct" onclick="judge(true)">〇 合ってた</button>
 <button class="wrong" onclick="judge(false)">× 間違えた</button>
 <button class="next" onclick="nextCard()">次へ</button>
+<button onclick="resetCards()">最初から</button>
 </div>
 
 <div class="stats">
-正解 <span id="ok">0</span>　
+正解 <span id="ok">0</span>
 不正解 <span id="ng">0</span><br><br>
 正解率 <span id="rate">0</span>%
 </div>
@@ -157,244 +158,93 @@ let show=false;
 let ok=0;
 let ng=0;
 
+// ランダム順を保存
+let order=[];
+let index=0;
+
+function shuffle(){
+
+    order=[...Array(cards.length).keys()];
+
+    for(let i=order.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [order[i],order[j]]=[order[j],order[i]];
+    }
+
+    index=0;
+}
+
 function nextCard(){
 
-show=false;
+    show=false;
 
-current=Math.floor(Math.random()*cards.length);
+    if(order.length===0){
+        shuffle();
+    }
 
-document.getElementById("abbr").innerHTML=cards[current][0];
-document.getElementById("jp").innerHTML=cards[current][1];
-document.getElementById("jp").style.display="none";
+    if(index>=order.length){
+
+        document.getElementById("abbr").innerHTML="🎉 終了！";
+        document.getElementById("jp").innerHTML="すべてのカードを確認しました";
+        document.getElementById("jp").style.display="block";
+
+        return;
+    }
+
+    current=order[index];
+    index++;
+
+    document.getElementById("abbr").innerHTML=cards[current][0];
+    document.getElementById("jp").innerHTML=cards[current][1];
+    document.getElementById("jp").style.display="none";
 
 }
 
 function flip(){
 
-show=!show;
+    show=!show;
 
-document.getElementById("jp").style.display=show?"block":"none";
-
-}
-
-function judge(ans){
-
-if(ans) ok++;
-else ng++;
-
-document.getElementById("ok").innerHTML=ok;
-document.getElementById("ng").innerHTML=ng;
-
-let total=ok+ng;
-
-document.getElementById("rate").innerHTML=
-Math.round(ok/total*100);
-
-nextCard();
-
-}
-
-nextCard();
-
-</script>
-
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IVR略語暗記カード</title>
-
-<style>
-body{
-font-family: sans-serif;
-background:#f2f2f2;
-margin:0;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-}
-
-.container{
-width:95%;
-max-width:500px;
-text-align:center;
-}
-
-.card{
-background:white;
-border-radius:20px;
-padding:50px 20px;
-box-shadow:0 5px 20px rgba(0,0,0,.2);
-min-height:250px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-cursor:pointer;
-transition:.3s;
-}
-
-.card:hover{
-transform:scale(1.02);
-}
-
-#abbr{
-font-size:50px;
-font-weight:bold;
-}
-
-#jp{
-margin-top:25px;
-font-size:28px;
-display:none;
-color:#1565c0;
-}
-
-button{
-margin:10px;
-padding:15px 30px;
-font-size:20px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-}
-
-.correct{
-background:#4CAF50;
-color:white;
-}
-
-.wrong{
-background:#f44336;
-color:white;
-}
-
-.next{
-background:#2196F3;
-color:white;
-}
-
-.stats{
-margin-top:20px;
-font-size:22px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="card" onclick="flip()">
-<div id="abbr"></div>
-<div id="jp"></div>
-</div>
-
-<div style="margin-top:20px;">
-<button class="correct" onclick="judge(true)">〇 合ってた</button>
-<button class="wrong" onclick="judge(false)">× 間違えた</button>
-<button class="next" onclick="nextCard()">次へ</button>
-</div>
-
-<div class="stats">
-正解 <span id="ok">0</span>　
-不正解 <span id="ng">0</span><br><br>
-正解率 <span id="rate">0</span>%
-</div>
-
-</div>
-
-<script>
-
-const cards=[
-
-["IVR","血管内治療"],
-["CAG","冠動脈造影"],
-["PCI・PTCA","心臓血管IVR"],
-["IVUS","超音波"],
-["OCT","レーザー光"],
-["PCI","経皮的冠動脈形成術"],
-["POBA","バルーン拡張術"],
-["PTCRA","ローターブレーター"],
-["DES","薬剤溶出型ステント"],
-["AMI","急性心筋梗塞"],
-["OMI","慢性心筋梗塞"],
-["CI","脳梗塞"],
-["DA","内頸動脈造影"],
-["DSA","サブトラクション血管造影"],
-["CAS","頸動脈ステント留置術"],
-["PTA","経皮的血管内形成術"],
-["SAH","くも膜下出血"],
-["HCC","肝細胞癌"],
-["TACE","経カテーテル的肝動脈化学塞栓術"],
-["CTAP","動脈性門脈造影下CT"],
-["CTHA","肝動脈CT"],
-["TAE","経カテーテル的肝動脈塞栓術"],
-["TAI","経カテーテル的肝動脈注入化学療法"],
-["RFA","ラジオ波焼灼術"],
-["PEIT","経皮的エタノール注入療法"],
-["DIC","点滴静注胆道造影"],
-["ERCP","内視鏡的逆行性胆道膵管造影"],
-["EST","内視鏡的乳頭切開術"],
-["PTGBD","経皮経肝胆嚢ドレナージ"],
-["PTC","経皮経肝胆管造影"],
-["PTCD","経皮経肝胆道ドレナージ"],
-["ENBD","内視鏡的経鼻胆道ドレナージ"],
-["ERBD","内視鏡的逆行性胆道ドレナージ"],
-["PVP","経皮的椎体形成術"],
-["HSG","子宮卵管造影"],
-["DIP","点滴静注腎盂造影"],
-["RP","逆行性腎盂造影"],
-["CG","膀胱造影"],
-["UCG","尿道膀胱造影"],
-["VCG","排尿時膀胱造影"]
-
-];
-
-let current;
-let show=false;
-let ok=0;
-let ng=0;
-
-function nextCard(){
-
-show=false;
-
-current=Math.floor(Math.random()*cards.length);
-
-document.getElementById("abbr").innerHTML=cards[current][0];
-document.getElementById("jp").innerHTML=cards[current][1];
-document.getElementById("jp").style.display="none";
-
-}
-
-function flip(){
-
-show=!show;
-
-document.getElementById("jp").style.display=show?"block":"none";
+    document.getElementById("jp").style.display=show?"block":"none";
 
 }
 
 function judge(ans){
 
-if(ans) ok++;
-else ng++;
+    if(index>order.length){
+        return;
+    }
 
-document.getElementById("ok").innerHTML=ok;
-document.getElementById("ng").innerHTML=ng;
+    if(ans) ok++;
+    else ng++;
 
-let total=ok+ng;
+    document.getElementById("ok").innerHTML=ok;
+    document.getElementById("ng").innerHTML=ng;
 
-document.getElementById("rate").innerHTML=
-Math.round(ok/total*100);
+    let total=ok+ng;
 
-nextCard();
+    document.getElementById("rate").innerHTML=
+    Math.round(ok/total*100);
+
+    nextCard();
 
 }
 
+function resetCards(){
+
+    ok=0;
+    ng=0;
+
+    document.getElementById("ok").innerHTML=0;
+    document.getElementById("ng").innerHTML=0;
+    document.getElementById("rate").innerHTML=0;
+
+    order=[];
+    shuffle();
+    nextCard();
+
+}
+
+shuffle();
 nextCard();
 
 </script>
